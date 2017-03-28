@@ -225,35 +225,71 @@ void Operations::syncLogs() {
     cout << "I'm fucking working" << endl;
     for(int i = 0; i < limitedG.size(); i++) {
         string raw = limitedG[i].first;
+        Goal *goal = new Goal();
+        goal->searchAndGet(raw,Cons::TYPE_LIMITED());
+        if(goal->getCountOffline() == Cons::COUNT_OFFLINE()) {
+            cout << "Counting for this one : " << raw << endl;
+            //preparing path of the log
+            string fullPath = Cons::LGLOGS();
+            fullPath += ("\\" + raw )+ ".logpf";
+            cout << "Full Path = " << fullPath << endl;
+            int x = fullPath.size();
+            char s[x];
+            copy(fullPath.begin(),fullPath.end(),s);
 
-        //preparing path of the log
-        string fullPath = Cons::LGLOGS();
-        fullPath += ("\\" + raw )+ ".logpf";
-        cout << "Full Path = " << fullPath << endl;
-        int x = fullPath.size();
-        char s[x];
-        copy(fullPath.begin(),fullPath.end(),s);
-       if(!fc.fEx(s)) {
-           cout << "File "<< raw << "does not exist !" << endl;
-            ofstream cf(fullPath.c_str());
-            cf.close();
-            cout << "Created " << s << endl;
-       }
-        if(hasEmptyLog(raw,Cons::TYPE_LIMITED())) {
-            Goal g;
-            g.searchAndGet(raw,Cons::TYPE_LIMITED());
-            recordDay(raw,Cons::TYPE_LIMITED(),g.getStartDate(),0);
+           if(!fc.fEx(s)) {
+                ofstream cf(fullPath.c_str());
+                cf.close();
+                cout << "Created " << s << endl;
+           }
+            if(hasEmptyLog(raw,Cons::TYPE_LIMITED())) {
+                Goal g;
+                g.searchAndGet(raw,Cons::TYPE_LIMITED());
+                recordDay(raw,Cons::TYPE_LIMITED(),g.getStartDate(),0);
+            }
+            QDate wantedDate = QDate::currentDate().addDays(-1);
+            QDate logLastDate = QDate::fromString(QString::fromStdString(getLastDayDate(raw,Cons::TYPE_LIMITED())),"ddMMyyyy");
+            while (logLastDate < wantedDate) {
+                logLastDate = logLastDate.addDays(1);
+                recordDay(raw,Cons::TYPE_LIMITED(),logLastDate.toString("ddMMyyyy").toStdString(),0);
+            }
         }
-        QDate wantedDate = QDate::currentDate().addDays(-1);
-        QDate logLastDate = QDate::fromString(QString::fromStdString(getLastDayDate(raw,Cons::TYPE_LIMITED())),"ddMMyyyy");
-        while (logLastDate < wantedDate) {
-            logLastDate = logLastDate.addDays(1);
-            recordDay(raw,Cons::TYPE_LIMITED(),logLastDate.toString("ddMMyyyy").toStdString(),0);
+        delete goal;
+    }
+
+    for(int i = 0; i < unlimitedG.size(); i++) {
+        string raw = unlimitedG[i].first;
+        Goal *goal = new Goal();
+        goal->searchAndGet(raw,Cons::TYPE_UNLIMITED());
+        if(goal->getCountOffline() == Cons::COUNT_OFFLINE()) {
+            cout << "Counting for this one : " << raw << endl;
+            //preparing path of the log
+            string fullPath = Cons::UGLOGS();
+            fullPath += ("\\" + raw )+ ".logpf";
+            cout << "Full Path = " << fullPath << endl;
+            int x = fullPath.size();
+            char s[x];
+            copy(fullPath.begin(),fullPath.end(),s);
+
+           if(!fc.fEx(s)) {
+                ofstream cf(fullPath.c_str());
+                cf.close();
+                cout << "Created " << s << endl;
+           }
+            if(hasEmptyLog(raw,Cons::TYPE_UNLIMITED())) {
+                Goal g;
+                g.searchAndGet(raw,Cons::TYPE_UNLIMITED());
+                recordDay(raw,Cons::TYPE_UNLIMITED(),g.getStartDate(),0);
+            }
+            QDate wantedDate = QDate::currentDate().addDays(-1);
+            QDate logLastDate = QDate::fromString(QString::fromStdString(getLastDayDate(raw,Cons::TYPE_UNLIMITED())),"ddMMyyyy");
+            while (logLastDate < wantedDate) {
+                logLastDate = logLastDate.addDays(1);
+                recordDay(raw,Cons::TYPE_UNLIMITED(),logLastDate.toString("ddMMyyyy").toStdString(),0);
+            }
         }
+        delete goal;
 }
-    //for(int i = 0; i < unlimitedG.size(); i++) {
-      //  cout << limitedG[i].first << endl;
-  //  }
 
 }
 

@@ -46,7 +46,9 @@ public:
     bool searchAndGet(string name, int type);
     void add();
     void clone(Goal &g);
+
     void update(Goal g, int type, int option);
+    void update(int type);
 
 protected:
     //Data Members

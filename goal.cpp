@@ -116,8 +116,8 @@ string Goal::toString() {
     objString += name + '|';
     objString += startDate + '|';
     objString += op.i2s(scope) + '|';
-    objString += op.i2s(finalGoal) + '|';
-    objString += op.i2s(limit) + '|';
+    objString += op.i2s(finalGoal) + '|'; //zero if unlimited
+    objString += op.i2s(limit) + '|';   //zero if unlimited
     objString += unit + '|';
     objString += op.i2s(unitsPerScope) + '|';
     objString += op.i2s(countOffline) + '|';
@@ -279,4 +279,10 @@ void Goal::update(Goal g, int type, int option) {
         ev += "\" : Failed ! ,reason : File is Empty .";
         lav.logEvent(ev,Cons::EVENT_ERROR());
     }
+}
+
+//deletes the goal
+void Goal::update(int type) {
+    Goal g;
+    update(g,type,Cons::OPTION_DELETE());
 }
